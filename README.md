@@ -2,191 +2,190 @@
 
 # Whoop Loop
 
-**Браслет Whoop даёт цифры. Whoop Loop превращает их в решения.**
+**WHOOP gives you numbers. Whoop Loop turns them into decisions.**
 
-Личный ИИ-аналитик здоровья поверх Whoop API: замечает ранние признаки
-болезни по отклонению от *вашей* нормы, считает настоящий расход калорий
-вместо оценки браслета и каждое утро говорит, как прожить этот день.
-Весь интерфейс — Telegram-бот и виджеты на iPhone.
+A personal AI health analyst on top of the WHOOP API. It spots early signs of
+getting sick by comparing each night with *your own* baseline, works out your
+real calorie burn instead of trusting the strap's estimate, and every morning
+tells you how to run the day. The whole interface is a Telegram bot and
+iPhone widgets.
 
 ![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
-![Telegram](https://img.shields.io/badge/интерфейс-Telegram-26A5E4?logo=telegram&logoColor=white)
+![Telegram](https://img.shields.io/badge/interface-Telegram-26A5E4?logo=telegram&logoColor=white)
 ![Claude](https://img.shields.io/badge/Claude-MCP-D97757)
-![Whoop API](https://img.shields.io/badge/Whoop%20API-v2-111111)
+![WHOOP API](https://img.shields.io/badge/WHOOP%20API-v2-111111)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<img src="docs/img/widgets.png" alt="Виджеты Whoop Loop: восстановление, сон, нагрузка, тревожный режим и экран блокировки" width="760">
+<img src="docs/img/widgets.png" alt="Whoop Loop widgets: recovery, sleep, strain, alert mode and lock screen" width="760">
 
-<sub>Виджеты на демо-данных: восстановление, сон, нагрузка, тревожный режим, экран блокировки.</sub>
+<sub>Widgets on demo data: recovery, sleep, strain, alert mode, lock screen.</sub>
 
 </div>
 
 ---
 
-*English: a personal health analyst on top of the Whoop API — early illness
-warnings from personal baselines, self-calibrating calorie targets, a morning
-brief, iPhone widgets and an MCP server for Claude. The bot speaks Russian.*
+> **Language note:** the bot and the widgets currently speak Russian. An English
+> interface is the top item on the roadmap — a good first contribution.
 
-## Зачем это
+## Why
 
-Приложение Whoop показывает восстановление 47% — и что с этим делать, решать
-вам. Whoop Loop отвечает на вопросы, ради которых браслет вообще покупают:
+The WHOOP app shows 47% recovery — and what to do about it is up to you.
+Whoop Loop answers the questions people actually buy a wearable for:
 
-- **Я заболеваю?** Пульс покоя, температура кожи и дыхание обычно сдвигаются
-  раньше, чем появляется насморк. Бот сравнивает их не со средними по
-  больнице, а с вашей личной нормой за 4 недели.
-- **Сколько мне на самом деле есть?** Расход калорий от Whoop ошибается
-  систематически. Бот раз в неделю сверяет его с реальным изменением веса и
-  вычисляет поправку — через 3–4 недели цель по калориям становится вашей.
-- **Тяжёлый день или разгрузка?** Утренняя сводка собирает сон, восстановление,
-  нагрузку и питание в одну рекомендацию.
+- **Am I getting sick?** Resting heart rate, skin temperature and breathing
+  usually shift before the first sniffle. The bot compares them not with
+  population averages but with your personal norm over the last 4 weeks.
+- **How much should I really eat?** WHOOP's calorie burn has a systematic
+  error. Once a week the bot checks it against your actual weight change and
+  computes a correction — after 3–4 weeks the calorie target is truly yours.
+- **Push hard or take it easy?** The morning brief folds sleep, recovery,
+  strain and food into one recommendation.
 
-## Утро с Whoop Loop
+## A morning with Whoop Loop
 
-Каждое утро, как только Whoop оценил ночь, в Telegram приходит одно сообщение
-(пример на демо-данных):
+As soon as WHOOP has scored the night, one message arrives in Telegram
+(demo data, translated from Russian):
 
 ```
-Доброе утро. 9 октября, пятница
+Good morning. Friday, October 9
 
-🟡 Восстановление: 47% — жёлтая зона
-   HRV 62 мс (+6 к норме), пульс покоя 52 (−4 к норме)
+🟡 Recovery: 47% — yellow zone
+   HRV 62 ms (+6 vs norm), resting HR 52 (−4 vs norm)
 
-😴 Сон: 8ч 32м — качество 59%
-   глубокий 1ч 53м, быстрый 2ч 03м, пробуждений 9
+😴 Sleep: 8h 32m — performance 59%
+   deep 1h 53m, REM 2h 03m, 9 disturbances
 
-🍽 Цель на сегодня: 2 199 ккал (снижение)
-   расход ≈ 2 749 ккал, коэффициент ещё не откалиброван
-   съедено 2 091, осталось 108 · белок 154/140 г
-⚖️ Вес: 77.9 кг (сглаженный тренд 77.7, ↓ 0.40 кг/нед)
+🍽 Today's target: 2,199 kcal (cutting)
+   burn ≈ 2,749 kcal, correction factor not calibrated yet
+   eaten 2,091, 108 left · protein 154/140 g
+⚖️ Weight: 77.9 kg (smoothed trend 77.7, ↓ 0.40 kg/week)
 
-Сегодня: обычный день. Прогулка в удовольствие, работа без героизма,
-и постарайся лечь раньше обычного.
+Today: an ordinary day. A walk for pleasure, work without heroics,
+and try to get to bed earlier than usual.
 ```
 
-Если ночь ещё не подтверждена в приложении Whoop, бот не выдаёт вчерашние
-цифры за сегодняшние, а ждёт и напоминает подтвердить сон.
+If the night hasn't been confirmed in the WHOOP app yet, the bot never passes
+yesterday's numbers off as today's — it waits and reminds you to confirm sleep.
 
-## Что внутри
+## What's inside
 
 | | |
 |---|---|
-| 🩺 **Раннее предупреждение о болезни** | Правила из исследований Stanford, WHOOP и UCSF: пульс две ночи подряд, дыхание, температура против личной нормы |
-| ⚖️ **Калории с самокалибровкой** | Настоящий расход из энергобаланса: еда − изменение веса × 7700 |
-| 🛑 **Стоп-кран дефицита** | Если на диете падает HRV, растёт пульс и портится сон — бот советует поднять калории |
-| 🌅 **Утренняя сводка и вечерний план** | Что делать сегодня; во сколько лечь, чтобы завтра восстановиться |
-| 🎙 **Голосовой дневник** | «Съел плов, два кофе, лёг в два» → структурированная запись (Whisper + Claude) |
-| 📱 **Виджеты для iPhone** | Главный экран и экран блокировки, три страницы, тревожный режим, серии |
-| 📈 **Графики** | PNG прямо в чат: вес, энергия, восстановление, сон, панель здоровья |
-| 🤖 **MCP-сервер** | Claude отвечает на вопросы о вашем здоровье по вашим же данным |
+| 🩺 **Early illness warning** | Rules from Stanford, UCSF and WHOOP studies: resting HR two nights in a row, breathing and skin temperature vs your personal norm |
+| ⚖️ **Self-calibrating calories** | Real expenditure from energy balance: intake − weight change × 7700 |
+| 🛑 **Deficit brake** | On a diet and HRV is falling, resting HR rising, sleep getting worse? The bot tells you to eat more |
+| 🌅 **Morning brief and bedtime plan** | What to do today; when to go to bed to recover by tomorrow |
+| 🎙 **Voice diary** | "Had plov, two coffees, went to bed at 2" → a structured record (Whisper + Claude) |
+| 📱 **iPhone widgets** | Home and lock screen, three pages, alert mode, streaks |
+| 📈 **Charts** | PNGs right in the chat: weight, energy, recovery, sleep, health panel |
+| 🤖 **MCP server** | Claude answers questions about your health from your own data |
 
-## Как это устроено
+## How it works
 
 ```mermaid
 flowchart LR
-    W[Браслет Whoop] -->|OAuth, синк каждые 30 мин| API[Whoop API v2]
-    API --> DB[(SQLite<br/>вся история)]
-    V[Голосовые и текст<br/>в Telegram] -->|Whisper + Claude| DB
-    DB --> A[Аналитика<br/>базовые линии · болезнь<br/>энергобаланс · стоп-кран]
-    A --> B[Telegram-бот<br/>сводки, тревоги, графики]
-    A --> G[Секретный Gist<br/>JSON-снимок]
-    G --> S[Виджеты iPhone<br/>Scriptable]
-    DB --> M[MCP-сервер] --> C[Claude]
+    W[WHOOP strap] -->|OAuth, sync every 30 min| API[WHOOP API v2]
+    API --> DB[(SQLite<br/>full history)]
+    V[Voice and text<br/>in Telegram] -->|Whisper + Claude| DB
+    DB --> A[Analytics<br/>baselines · illness<br/>energy balance · deficit brake]
+    A --> B[Telegram bot<br/>briefs, alerts, charts]
+    A --> G[Secret gist<br/>JSON snapshot]
+    G --> S[iPhone widgets<br/>Scriptable]
+    DB --> M[MCP server] --> C[Claude]
 ```
 
-Бот работает на long polling, поэтому сервер **не открывает наружу ни одного
-порта**. Виджет не может спросить сервер напрямую, поэтому бот раз в 15 минут
-выкладывает короткий снимок в секретный Gist, а виджет читает его оттуда.
+The bot uses long polling, so the server **opens no ports at all**. A widget
+can't ask the server directly, so every 15 minutes the bot posts a short
+snapshot to a secret gist and the widget reads it from there.
 
-## Как бот замечает болезнь
+## How the bot detects illness
 
-<img src="docs/img/illness-alert.png" alt="Панель здоровья: пульс, дыхание и температура за порогом тревоги" width="520" align="right">
+<img src="docs/img/illness-alert.png" alt="Health panel: resting HR, breathing and temperature past the alert threshold" width="520" align="right">
 
-Правила взяты из опубликованных исследований носимых устройств. Каждый
-показатель сравнивается с **вашей** нормой, а не со средней по популяции.
+The rules come from published wearable studies. Every signal is compared with
+**your** norm, not a population average.
 
-| Сигнал | Правило | Откуда |
+| Signal | Rule | Source |
 |---|---|---|
-| Пульс покоя | выше личной медианы на **4+ уд/мин две ночи подряд**; одна ночь — не тревога | Alavi et al., *Nature Medicine* 2022 — 80% случаев COVID-19 пойманы до или в день симптомов, в среднем за 3 дня |
-| Частота дыхания | норма — медиана и SD за ночи с 21-й по 7-ю назад; сравнивается среднее последних **двух** ночей | Miller et al., *PLOS ONE* 2020 — исследование на данных WHOOP; у здорового человека разброс всего ~0,5 вдоха/мин |
-| Температура кожи | z-оценка против 21-дневной нормы, среднее двух ночей | Mason et al., *Scientific Reports* 2022 (TemPredict) — температура подняла точность (ROC AUC 0,77 → 0,82) |
-| HRV | падение — только как поддержка | Hirten et al., *JMIR* 2021; Natarajan et al., *npj Digital Medicine* 2020 |
+| Resting heart rate | **≥ 4 bpm above your personal median, two nights in a row**; one night is never an alert | Alavi et al., *Nature Medicine* 2022 — 80% of COVID-19 cases flagged at or before symptom onset, median 3 days early |
+| Respiratory rate | norm = median and SD of nights 21 to 7 back; compared with the mean of the last **two** nights | Miller et al., *PLOS ONE* 2020 — WHOOP's own data; a healthy person varies by only ~0.5 breaths/min |
+| Skin temperature | z-score vs a 21-day norm, mean of two nights | Mason et al., *Scientific Reports* 2022 (TemPredict) — temperature raised accuracy (ROC AUC 0.77 → 0.82) |
+| HRV | a drop — supporting evidence only | Hirten et al., *JMIR* 2021; Natarajan et al., *npj Digital Medicine* 2020 |
 
-**Решение.** 🔴 тревога — когда есть две *независимые* линии доказательств:
-пульс две ночи подряд **и** дыхание или температура, либо дыхание **и**
-температура вместе. 🟡 наблюдение — один сильный сигнал или сигнал с HRV.
+**The decision.** 🔴 an alert needs two *independent* lines of evidence:
+resting HR two nights in a row **plus** breathing or temperature, or breathing
+**and** temperature together. 🟡 a watch is one strong signal, or one backed
+by HRV.
 
-**Почему HRV не подтверждает пульс.** Оба отражают одно состояние нервной
-системы и двигаются вместе: на синтетической истории все ложные тревоги
-давала именно пара «пульс + HRV». Дыхание и температура — отдельные каналы.
+**Why HRV can't confirm resting HR.** Both read the same autonomic state and
+move together: on synthetic history, every false alarm came from the
+"resting HR + HRV" pair. Breathing and temperature are separate channels.
 
-**Известные причины ложных тревог.** Alavi et al. называют алкоголь, стресс,
-тяжёлые тренировки, перелёты и прививки (пульс пикует на 1–2 ночь после
-дозы). Pietilä et al. (*JMIR Mental Health* 2018, 4098 человек): умеренная
-доза алкоголя поднимает пульс во сне на 4 уд/мин, высокая — на 8,7, то есть
-сама по себе достигает порога тревоги. Если такое было накануне, тревога
-понижается до наблюдения и бот пишет почему:
+**Known causes of false alarms.** Alavi et al. name alcohol, stress, intense
+exercise, travel and vaccination (resting HR peaks 1–2 nights after a dose).
+Pietilä et al. (*JMIR Mental Health* 2018, n = 4,098): a moderate dose of
+alcohol raises sleeping heart rate by 4 bpm and a high dose by 8.7 — enough on
+its own to reach the alert line. If any of these happened the evening
+before, an alert is downgraded to a watch and the bot says why:
 
-| Причина | Откуда бот знает |
+| Cause | How the bot knows |
 |---|---|
-| алкоголь, сильный стресс (8+/10), поездка | голосовой дневник |
-| перелёт | **сам**: WHOOP записывает часовой пояс каждой ночи |
-| тяжёлая тренировка (strain 16+) | **сам**: данные WHOOP |
-| прививка | команда `/vaccine` |
+| alcohol, high stress (8+/10), a trip | voice diary |
+| a flight | **automatically**: WHOOP records the time zone of every night |
+| a very hard workout (strain 16+) | **automatically**: WHOOP data |
+| a vaccine dose | the `/vaccine` command |
 
-**Учится на ваших ответах.** После тревоги бот вечером спрашивает кнопками:
-«🤒 Заболел / 😐 Была другая причина / 🙂 Всё нормально». Заболели без
-тревоги — `/sick`, это пропущенный случай. `/accuracy` показывает личную
-статистику: сколько тревог оказались болезнью, сколько болезней бот заметил
-заранее. Синтетика проверяет логику, а эти ответы — единственный способ
-узнать, прав ли детектор именно для вас.
+**It learns from your answers.** The evening after an alert the bot asks, with
+buttons: "🤒 Got sick / 😐 Something else / 🙂 Nothing happened". Got sick
+without an alert? Send `/sick` — that's a missed case. `/accuracy` shows your
+personal track record: how many alerts turned out to be illness and how many
+illnesses were caught in advance. Synthetic data tests the logic; these
+answers are the only way to know whether the detector is right for you.
 
-**Проверено и отброшено: CuSum.** У Alavi et al. был второй алгоритм — CuSum,
-он копит мелкие отклонения пульса день за днём. На синтетической истории
-(4 здоровых истории × 110 дней, 5 резких и 4 постепенных эпизода болезни)
-он не поймал ни одного эпизода раньше правил выше и добавил ложную тревогу.
-Сам по себе на пульсе он шумный — специфичность в исследовании 83,7%.
-Поэтому в решение он не входит.
+**Tried and dropped: CuSum.** Alavi et al. also ran a second algorithm, CuSum,
+which adds up small nightly excesses. On synthetic history (4 healthy
+histories × 110 days, 5 abrupt and 4 gradual illness episodes) it caught no
+episode earlier than the rules above and added a false alarm. On resting HR
+alone it's noisy — 83.7% specificity in the study. So it's not part of the
+decision.
 
-**Что выбрано нами, а не исследованиями:** порог 2σ для дыхания и
-температуры, −1,5σ для HRV и сама комбинация сигналов. Исследования
-показывают, что эти сигналы сдвигаются и что их сочетание точнее; готового
-правила для такой комбинации на данных WHOOP они не публикуют.
+**Our choices, not the studies':** the 2σ line for breathing and temperature,
+−1.5σ for HRV, and the way the signals are combined. The studies show that
+these signals move and that combining them helps; they don't publish a ready
+rule for this exact combination on WHOOP data.
 
-**Проверка на синтетике:** на 440 здоровых днях — 1 ложная тревога
-(19 наблюдений), на 9 сгенерированных эпизодах болезни (резких и
-постепенных) — 9 тревог. Это проверка логики, а не
-клиническая валидация. Полный список источников — в
+**Synthetic check:** 1 false alert (and 19 watches) in 440 healthy days;
+9 alerts on 9 generated illness episodes, abrupt and gradual. That tests the
+logic — it is not clinical validation. Full references are in
 [`app/analytics/illness.py`](app/analytics/illness.py).
 
 <br clear="right">
 
-## Как работает калибровка калорий
+## How calorie calibration works
 
-<img src="docs/img/weight.png" alt="Вес: замеры и сглаженный тренд" width="520" align="right">
+<img src="docs/img/weight.png" alt="Weight: measurements and smoothed trend" width="520" align="right">
 
-Whoop измеряет расход по пульсу, но с систематической ошибкой. Оценка еды
-тоже неточна. Контур не борется с этим напрямую — он замеряет суммарную
-ошибку и вычитает её:
+WHOOP estimates calorie burn from heart rate, with a systematic error. Food
+logging is imprecise too. The loop doesn't fight either error head-on — it
+measures the combined error and subtracts it:
 
-1. За две недели считается средний приход и средний расход по Whoop.
-2. По ряду взвешиваний методом наименьших квадратов берётся наклон —
-   реальное изменение массы.
-3. Из энергобаланса выводится настоящий расход:
-   `TDEE = приход − наклон × 7700`.
-4. Коэффициент `TDEE / расход_Whoop` уходит в цель следующей недели.
+1. Over two weeks it averages intake and WHOOP's burn.
+2. A least-squares slope through the weigh-ins gives the real change in mass.
+3. Energy balance gives the real expenditure:
+   `TDEE = intake − slope × 7700`.
+4. The factor `TDEE / WHOOP_burn` feeds next week's target.
 
-Через 3–4 недели коэффициент сходится, и точность отдельных оценок перестаёт
-иметь значение — важна только стабильность ошибки. Коэффициент зажат в
-0.75–1.25: выход за эти рамки значит «дырявый учёт», а не «удивительный
-метаболизм».
+After 3–4 weeks the factor converges and the accuracy of individual
+estimates stops mattering — only the stability of the error does. The factor
+is clamped to 0.75–1.25: going outside that means leaky logging, not an
+amazing metabolism.
 
 <br clear="right">
 
-## Попробовать за 2 минуты — без браслета
+## Try it in 2 minutes — no WHOOP needed
 
-Демо-режим генерирует 4 месяца правдоподобной истории, в том числе
-«начало болезни», чтобы увидеть тревогу:
+Demo mode generates 4 months of plausible history, including the onset of an
+illness so you can see an alert:
 
 ```bash
 git clone https://github.com/omertaevalibekai/whoop-loop.git
@@ -195,177 +194,180 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt   # Linux/macOS: .venv/bin/python
 
 python cli.py demo --days 120 --with-illness
-python cli.py digest      # утренняя сводка
-python cli.py charts      # графики в папку charts/
-python cli.py widget show # данные, которые получит виджет
+python cli.py digest      # the morning brief
+python cli.py charts      # charts into charts/
+python cli.py widget show # the data a widget would get
 ```
 
-Демо-данные пишутся в ту же базу — перед настоящим запуском удалите
-`data/whoop.db`.
+Demo data goes into the same database — delete `data/whoop.db` before a real
+run.
 
-## Установка с настоящим Whoop
+## Setup with a real WHOOP
 
 ```bash
 cp .env.example .env
 ```
 
-| Переменная | Где взять | Обязательно |
+| Variable | Where to get it | Required |
 |---|---|---|
-| `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET` | [developer.whoop.com](https://developer.whoop.com) → Create App, redirect URI `http://localhost:8000/callback` | да |
-| `TELEGRAM_BOT_TOKEN` | @BotFather | да |
-| `TELEGRAM_CHAT_ID` | бот сам закрепит первый чат, нажавший `/start`; можно задать явно | нет |
-| `ANTHROPIC_API_KEY` | console.anthropic.com | нет — без него дневник разбирается правилами |
-| `OPENAI_API_KEY` | platform.openai.com | нет — без него голосовые отключены, текст работает |
-| `WIDGET_GITHUB_TOKEN` | GitHub → Settings → Tokens (classic), только право `gist` | нет — нужен для виджетов |
+| `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET` | [developer.whoop.com](https://developer.whoop.com) → Create App, redirect URI `http://localhost:8000/callback` | yes |
+| `TELEGRAM_BOT_TOKEN` | @BotFather | yes |
+| `TELEGRAM_CHAT_ID` | the bot binds the first chat that sends `/start`; can be set explicitly | no |
+| `ANTHROPIC_API_KEY` | console.anthropic.com | no — without it the diary is parsed with rules |
+| `OPENAI_API_KEY` | platform.openai.com | no — without it voice messages are off, text works |
+| `WIDGET_GITHUB_TOKEN` | GitHub → Settings → Tokens (classic), `gist` scope only | no — needed for widgets |
 
-Приложению Whoop нужны скоупы: `offline`, `read:recovery`, `read:cycles`,
+The WHOOP app needs these scopes: `offline`, `read:recovery`, `read:cycles`,
 `read:sleep`, `read:workout`, `read:profile`, `read:body_measurement`.
 
-Запуск:
+Run:
 
 ```bash
-python run_api.py    # OAuth-callback и вебхуки Whoop, порт 8000
-python run_bot.py    # Telegram-бот и планировщик
-python cli.py auth   # ссылка для подключения Whoop
+python run_api.py    # WHOOP OAuth callback and webhooks, port 8000
+python run_bot.py    # Telegram bot and scheduler
+python cli.py auth   # link to connect WHOOP
 ```
 
-После авторизации история за год загрузится в фоне. Дальше — `/start` в боте.
+After authorization a year of history loads in the background. Then send
+`/start` to the bot.
 
-### Команды бота
+### Bot commands
 
-| Команда | Что делает |
+| Command | What it does |
 |---|---|
-| просто число (`82.4`) | записать вес |
-| голосовое или текст | разобрать еду, алкоголь, кофе, стресс |
-| `/today` · `/digest` | состояние сейчас · утренняя сводка |
-| `/health` | панель здоровья и риск заболеть |
-| `/sick` · `/vaccine` · `/accuracy` | я заболел · сегодня прививка · насколько детектор угадывает у меня |
-| `/night` | во сколько лечь и что будет утром |
-| `/guard` · `/week` | стоп-кран дефицита · недельная калибровка |
-| `/charts` `/weight` `/energy` `/recovery` `/sleep` | графики |
-| `/goal cut 0.5` · `/protein 150` · `/eat 650 плов` | цель, белок, еда вручную |
+| just a number (`82.4`) | log weight |
+| a voice message or text | parse food, alcohol, coffee, stress |
+| `/today` · `/digest` | current state · morning brief |
+| `/health` | health panel and illness risk |
+| `/sick` · `/vaccine` · `/accuracy` | I'm sick · vaccine today · how well the detector works for me |
+| `/night` | when to go to bed and what tomorrow looks like |
+| `/guard` · `/week` | deficit brake · weekly calibration |
+| `/charts` `/weight` `/energy` `/recovery` `/sleep` | charts |
+| `/goal cut 0.5` · `/protein 150` · `/eat 650 plov` | goal, protein, manual food entry |
 
-### Виджеты для iPhone
+### iPhone widgets
 
-1. Заполните `WIDGET_GITHUB_TOKEN` и выполните `python cli.py widget setup`.
-   Бот создаст секретный Gist и напечатает ссылку на готовый скрипт.
-2. Установите [Scriptable](https://apps.apple.com/app/scriptable/id1405459188),
-   создайте скрипт и вставьте содержимое ссылки.
-3. Добавьте виджет Scriptable. Параметр виджета выбирает страницу:
-   пусто — восстановление, `sleep` — сон, `body` — нагрузка и питание.
-   Три виджета в стопке листаются пальцем.
+1. Set `WIDGET_GITHUB_TOKEN` and run `python cli.py widget setup`. The bot
+   creates a secret gist and prints a link to a ready-made script.
+2. Install [Scriptable](https://apps.apple.com/app/scriptable/id1405459188),
+   create a script and paste the contents of the link.
+3. Add a Scriptable widget. The widget parameter picks the page: empty —
+   recovery, `sleep` — sleep, `body` — strain and nutrition. Stack three
+   widgets and swipe between them.
 
-Код виджета телефон подтягивает сам раз в час: после правок в `widget/`
-достаточно `python cli.py widget scripts`. Посмотреть, как виджеты выглядят,
-можно без телефона: `widget/preview/index.html` — эмулятор Scriptable в
-браузере.
+The phone pulls the widget code by itself once an hour: after editing
+`widget/`, `python cli.py widget scripts` is enough. To see the widgets
+without a phone, open `widget/preview/index.html` — a Scriptable emulator in
+the browser.
 
-### MCP для Claude
+### MCP for Claude
 
 ```bash
 claude mcp add whoop -- /path/to/whoop-loop/.venv/bin/python /path/to/whoop-loop/run_mcp.py
 ```
 
-Инструменты: `whoop_status`, `whoop_digest`, `whoop_metric`,
-`whoop_illness_check`, `whoop_deficit_guard`, `whoop_energy`, `whoop_workouts`,
-`whoop_diary`, `whoop_sql` (только SELECT). Можно спросить Claude «как кофе
-после 16:00 влияет на мой глубокий сон» — и он посчитает по вашей базе.
+Tools: `whoop_status`, `whoop_digest`, `whoop_metric`, `whoop_illness_check`,
+`whoop_deficit_guard`, `whoop_energy`, `whoop_workouts`, `whoop_diary`,
+`whoop_sql` (SELECT only). Ask Claude "how does coffee after 4 pm affect my
+deep sleep?" — and it will work it out from your database.
 
-## Деплой на сервер
+## Deploying to a server
 
 ```bash
-./deploy/deploy-systemd.sh opc@<ip-сервера>
+./deploy/deploy-systemd.sh opc@<server-ip>
 ```
 
-Скрипт рассчитан на бесплатную машину Oracle Cloud (1 ГБ памяти): сам ставит
-Python 3.11, добавляет swap, копирует код и `.env`, при первом запуске
-переносит базу вместе с токеном Whoop и поднимает systemd-сервис. Путь к
-SSH-ключу — переменная `SSH_KEY` или файл `deploy/local.env`.
+The script targets a free Oracle Cloud machine (1 GB RAM): it installs
+Python 3.11, adds swap, copies the code and `.env`, on the first run moves the
+database together with the WHOOP token, and starts a systemd service. The SSH
+key path comes from the `SSH_KEY` variable or `deploy/local.env`.
 
 <details>
-<summary>Почему так, а не Docker</summary>
+<summary>Why this way and not Docker</summary>
 
-- **Docker не помещается.** Демон и сборка образа с numpy/matplotlib не
-  влезают в 1 ГБ.
-- **Тяжёлые шаги роняют SSH.** `dnf` и `pip` уводят машину в своп так глубоко,
-  что она перестаёт отвечать. `ssh host "долгая команда"` отваливается по
-  таймауту, а удалённая команда продолжает работать — и повторный запуск
-  сталкивается с ней. Поэтому тяжёлые шаги запускаются отсоединённо
-  (`setsid nohup`) и опрашиваются снаружи.
-- **pip ставит пакеты по одному.** Память съедает не колесо, а разрешение
-  зависимостей всего файла разом.
+- **Docker doesn't fit.** The daemon plus an image build with
+  numpy/matplotlib won't squeeze into 1 GB.
+- **Heavy steps knock out SSH.** `dnf` and `pip` push the machine so deep into
+  swap that it stops answering. `ssh host "long command"` times out while the
+  remote command keeps running — and a retry collides with it. So heavy steps
+  run detached (`setsid nohup`) and are polled from outside.
+- **pip installs packages one at a time.** Memory goes not on any single
+  wheel but on resolving the whole requirements file at once.
 
 </details>
 
-## Приватность и безопасность
+## Privacy and security
 
-- **Данные остаются у вас.** История живёт в локальной SQLite. Наружу уходят
-  только запросы к Whoop, к Telegram и — если включены — расшифровка голоса
-  (OpenAI) и разбор дневника (Anthropic).
-- **Бот отвечает только владельцу.** Первый чат, нажавший `/start`, становится
-  владельцем; остальным бот не отвечает вообще, даже на `/start`.
-- **Ссылка на Gist — секрет.** Секретный Gist не находится поиском, но любой,
-  у кого есть ссылка, видит снимок данных. В репозитории ссылок нет: скрипты
-  виджета хранят заглушки, настоящие адреса подставляются только при выкладке.
-- **Никаких открытых портов** в боевом режиме.
+- **Your data stays with you.** The history lives in a local SQLite file. The
+  only outbound calls go to WHOOP, Telegram and — if enabled — voice
+  transcription (OpenAI) and diary parsing (Anthropic).
+- **The bot answers only its owner.** The first chat to send `/start` becomes
+  the owner; everyone else gets no reply at all, not even to `/start`.
+- **The gist link is a secret.** A secret gist doesn't show up in search, but
+  anyone with the link can see the snapshot. The repository holds no links:
+  widget scripts carry placeholders, and real addresses are filled in only
+  when they're uploaded.
+- **No open ports** in production.
 
 ## FAQ
 
-**Это медицинский прибор?**
-Нет. Это личный инструмент, который показывает отклонения от вашей нормы. Он не
-ставит диагнозов; при плохом самочувствии идите к врачу, а не к боту.
+**Is this a medical device?**
+No. It's a personal tool that shows deviations from your own norm. It doesn't
+diagnose anything; if you feel unwell, see a doctor, not a bot.
 
-**Работает без Whoop?**
-Демо-режим — да, полностью. Для настоящих данных нужен Whoop и приложение в
-developer.whoop.com (бесплатно).
+**Does it work without a WHOOP?**
+Demo mode — fully. Real data needs a WHOOP and an app at developer.whoop.com
+(free).
 
-**Почему Telegram, а не своё приложение?**
-Telegram уже на телефоне, умеет голосовые, кнопки и графики, а уведомления
-приходят без отдельного магазина приложений.
+**Why Telegram instead of a native app?**
+Telegram is already on your phone, handles voice, buttons and images, and
+delivers notifications without an app store.
 
-**Можно на английском?**
-Пока интерфейс бота на русском. Перевод — хорошая первая задача для контрибьютора.
+**Is there an English version?**
+Not yet — the bot speaks Russian. Translating it is a great first
+contribution.
 
-**Сколько это стоит?**
-Сервер — бесплатный Oracle Cloud. OpenAI и Anthropic нужны только для голоса и
-разбора дневника, это копейки в месяц при личном использовании.
+**What does it cost?**
+The server is free Oracle Cloud. OpenAI and Anthropic are only needed for
+voice and diary parsing — pennies a month for personal use.
 
-## Планы
+## Roadmap
 
-- [ ] Английский интерфейс бота
-- [ ] Валидация порогов на реальных эпизодах болезни пользователей (с их согласия)
-- [ ] Связь со сном и календарём: какие дни встреч бьют по восстановлению
-- [ ] Большой виджет с графиками HRV и пульса за 2 недели
-- [ ] Экспорт отчёта для врача в PDF
+- [ ] English bot interface
+- [ ] Validate thresholds on real illness episodes from users (with consent)
+- [ ] Sleep vs calendar: which meeting-heavy days hit recovery hardest
+- [ ] A large widget with two weeks of HRV and resting HR
+- [ ] PDF report export for your doctor
 
-## Как помочь проекту
+## Contributing
 
-Issues и pull requests приветствуются. Перед PR:
+Issues and pull requests are welcome. Before a PR:
 
 ```bash
 pip install pytest && python -m pytest -q
 python cli.py demo --days 120 --with-illness && python cli.py digest
 ```
 
-Новая аналитика — в `app/analytics/`, у каждого модуля одна задача. Если вы
-меняете пороги детектора болезни, опишите в PR, на каких данных проверяли.
+New analytics go in `app/analytics/`, one job per module. If you change the
+illness detector's thresholds, say in the PR what data you checked them on.
 
-## Структура
+## Project layout
 
 ```
 app/
-  whoop/       OAuth, клиент API, синхронизация
-  analytics/   базовые линии, болезнь, энергия, стоп-кран, сводка, графики
-  diary/       расшифровка голоса, структурный разбор
-  bot/         Telegram-бот (и защита «только владелец»)
-  api/         FastAPI: OAuth-callback и вебхуки
-  widget.py    снимок для виджетов и выкладка в Gist
+  whoop/       OAuth, API client, sync
+  analytics/   baselines, illness, energy, deficit brake, brief, charts
+  diary/       voice transcription, structured parsing
+  bot/         Telegram bot (and the owner-only guard)
+  api/         FastAPI: OAuth callback and webhooks
+  widget.py    widget snapshot and gist upload
   mcp_server.py
-widget/        скрипты Scriptable и эмулятор для превью
-deploy/        деплой на маленький сервер без Docker
+widget/        Scriptable scripts and a preview emulator
+deploy/        deploying to a small server without Docker
 cli.py
 ```
 
-## Лицензия
+## License
 
-[MIT](LICENSE). Whoop — товарный знак WHOOP, Inc.; проект с ним не связан.
+[MIT](LICENSE). WHOOP is a trademark of WHOOP, Inc.; this project is not
+affiliated with it.
