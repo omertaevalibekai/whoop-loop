@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
-from app.analytics import guard, illness
+from app.analytics import feedback, guard, illness
 from app.analytics.digest import build_digest, has_today_recovery
 from app.analytics import evening
 from app import widget
@@ -236,6 +236,36 @@ async def job_evening(bot: Bot) -> None:
     await _send(bot, text)
 
 
+async def job_feedback(bot: Bot) -> None:
+    """Evening question about a recent illness alert: was it real?
+
+    The answers are the only ground truth the detector will ever get.
+    """
+    if not is_authorized():
+        return
+    chat_id = target_chat_id()
+    if chat_id is None:
+        return
+    today = today_local()
+    with session_scope() as session:
+        pending = feedback.pending_question(session, today)
+        if pending is None:
+            return
+        day, level = pending
+        if get_setting(session, "feedback_asked_for") == day.isoformat():
+            return                      # one question per alert, no nagging
+        set_setting(session, "feedback_asked_for", day.isoformat())
+
+    from app.bot.handlers import feedback_keyboard
+
+    what = "была тревога" if level == "alert" else "было предупреждение"
+    await bot.send_message(
+        chat_id,
+        f"🩺 {day.strftime('%d.%m')} у меня {what} о болезни. Как оно на самом деле?",
+        reply_markup=feedback_keyboard(day),
+    )
+
+
 async def job_widget() -> None:
     """Refresh the iPhone widget's gist; a no-op until the widget is set up."""
     if not is_authorized():
@@ -303,6 +333,13 @@ def build_scheduler(bot: Bot) -> AsyncIOScheduler:
         id="widget",
         max_instances=1,
         coalesce=True,
+    )
+    scheduler.add_job(
+        job_feedback,
+        CronTrigger(hour=settings.feedback_hour, minute=0),
+        args=[bot],
+        id="feedback",
+        max_instances=1,
     )
     scheduler.add_job(
         job_healthcheck,

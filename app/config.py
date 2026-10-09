@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     evening_minute: int = 30
     weekly_report_hour: int = 20
     healthcheck_hour: int = 21
+    # Evening question: was the recent illness alert real?
+    feedback_hour: int = 20
     sync_interval_minutes: int = 30
     api_host: str = "127.0.0.1"
     api_port: int = 8000

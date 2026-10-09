@@ -7,9 +7,9 @@ import re
 
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, CommandStart
-from aiogram.types import FSInputFile, Message
+from aiogram.types import CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
-from app.analytics import charts, evening, guard, illness, insights
+from app.analytics import charts, evening, feedback, guard, illness, insights
 from app.analytics.digest import build_digest, build_short_status
 from app.analytics.weekly import build_weekly
 from app.bot import keyboards as kb
@@ -38,6 +38,8 @@ HELP = """<b>Whoop Loop</b>
 /today — состояние сейчас
 /digest — утренняя сводка
 /health — панель здоровья и риск заболеть
+/sick — я заболел (учит детектор) · /vaccine — сегодня прививка
+/accuracy — насколько детектор болезни угадывает именно у тебя
 /guard — стоп-кран дефицита
 /night — во сколько ложиться и что будет утром
 /insights — что видно в твоих данных
@@ -123,6 +125,59 @@ async def cmd_today(message: Message) -> None:
 async def cmd_digest(message: Message) -> None:
     with session_scope() as session:
         await message.answer(build_digest(session))
+
+
+def feedback_keyboard(day: dt.date) -> InlineKeyboardMarkup:
+    stamp = day.isoformat()
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=feedback.LABELS[feedback.SICK], callback_data=f"ill:{stamp}:{feedback.SICK}")],
+        [InlineKeyboardButton(text=feedback.LABELS[feedback.OTHER], callback_data=f"ill:{stamp}:{feedback.OTHER}")],
+        [InlineKeyboardButton(text=feedback.LABELS[feedback.FINE], callback_data=f"ill:{stamp}:{feedback.FINE}")],
+    ])
+
+
+@router.callback_query(F.data.startswith("ill:"))
+async def on_illness_feedback(query: CallbackQuery) -> None:
+    _, stamp, kind = query.data.split(":", 2)
+    if kind not in feedback.LABELS:
+        await query.answer()
+        return
+    with session_scope() as session:
+        feedback.record(session, dt.date.fromisoformat(stamp), kind, source="feedback")
+    await query.answer("Записал, спасибо")
+    await query.message.edit_text(
+        f"{query.message.html_text}\n\nОтвет: <b>{feedback.LABELS[kind]}</b>. "
+        "Так детектор узнаёт, где он прав. Статистика — /accuracy"
+    )
+
+
+@router.message(Command("sick"))
+async def cmd_sick(message: Message) -> None:
+    with session_scope() as session:
+        feedback.record(session, today_local(), feedback.SICK, source="self")
+    await message.answer(
+        "Отметил: сегодня ты болеешь. Выздоравливай.\n\n"
+        "Если тревоги до этого не было — это пропущенный случай, и он тоже "
+        "попадёт в /accuracy. Болеешь несколько дней — отмечай каждый день."
+    )
+
+
+@router.message(Command("vaccine"))
+async def cmd_vaccine(message: Message) -> None:
+    with session_scope() as session:
+        feedback.record(session, today_local(), feedback.VACCINE, source="self")
+    await message.answer(
+        "Отметил прививку. Следующие две ночи пульс может подняться — "
+        "это нормальная реакция, тревогу о болезни я в эти дни смягчу."
+    )
+
+
+@router.message(Command("accuracy"))
+async def cmd_accuracy(message: Message) -> None:
+    days = 180
+    with session_scope() as session:
+        text = feedback.track_record(session, today_local(), days).render(days)
+    await message.answer(text)
 
 
 @router.message(Command("health"))

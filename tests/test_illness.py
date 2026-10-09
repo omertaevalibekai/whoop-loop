@@ -15,8 +15,11 @@ def sig(metric: str, flagged: bool, primary: bool = True) -> Signal:
 
 
 def run(rhr=False, yellow=False, rr=False, temp=False, hrv=False, confounders=()):
+    heart = sig("rhr", rhr)
+    if rhr:
+        heart.detail = "2 ночи подряд выше нормы на 4+"
     return decide(
-        sig("rhr", rhr), yellow, sig("resp_rate", rr), sig("skin_temp", temp),
+        heart, yellow, sig("resp_rate", rr), sig("skin_temp", temp),
         sig("hrv", hrv, primary=False), list(confounders),
     )
 
@@ -125,3 +128,85 @@ def test_generated_illness_raises_an_alert(demo):
     result = json.loads(make("--with-illness"))
     assert result["level"] == "alert"
     assert {"resp_rate", "skin_temp"} & set(result["flags"])
+
+
+# --- confounders and feedback on a real (throwaway) database ----------------
+
+def _run_in_db(db_url: str, root: str, code: str) -> str:
+    import subprocess
+    import sys
+    env = dict(os.environ, DB_URL=db_url, PYTHONIOENCODING="utf-8")
+    return subprocess.run([sys.executable, "-c", code], cwd=root, env=env,
+                          check=True, capture_output=True, text=True).stdout.strip().splitlines()[-1]
+
+
+CHECK = (
+    "import json; from app.db import session_scope; from app.analytics import illness\n"
+    "with session_scope() as s:\n"
+    "    r = illness.check(s); print(json.dumps({'level': r.level, 'conf': r.confounders}))"
+)
+
+
+def test_time_zone_change_downgrades_the_alert(demo):
+    import json
+    make, db_url, root = demo
+    assert json.loads(make("--with-illness"))["level"] == "alert"
+    _run_in_db(db_url, root, (
+        "from sqlalchemy import select; from app.db import session_scope; from app.models import Sleep\n"
+        "from app.util import today_local\n"
+        "with session_scope() as s:\n"
+        "    for sl in s.scalars(select(Sleep).where(Sleep.day == today_local())): sl.timezone_offset = '+09:00'\n"
+        "    for sl in s.scalars(select(Sleep).where(Sleep.day < today_local())): sl.timezone_offset = '+05:00'\n"
+        "print('ok')"
+    ))
+    result = json.loads(_run_in_db(db_url, root, CHECK))
+    assert result["level"] == "watch"
+    assert any("часового пояса" in c for c in result["conf"])
+
+
+def test_vaccine_dose_downgrades_the_alert(demo):
+    import json
+    make, db_url, root = demo
+    make("--with-illness")
+    _run_in_db(db_url, root, (
+        "import datetime as dt; from app.db import session_scope; from app.analytics import feedback\n"
+        "from app.util import today_local\n"
+        "with session_scope() as s: feedback.record(s, today_local() - dt.timedelta(days=1), 'vaccine')\n"
+        "print('ok')"
+    ))
+    result = json.loads(_run_in_db(db_url, root, CHECK))
+    assert result["level"] == "watch"
+    assert "прививка" in result["conf"]
+
+
+def test_feedback_question_answer_and_track_record(demo):
+    import json
+    make, db_url, root = demo
+    make()
+    out = _run_in_db(db_url, root, (
+        "import datetime as dt, json\n"
+        "from app.db import session_scope; from app.models import Alert\n"
+        "from app.analytics import feedback\n"
+        "from app.util import today_local\n"
+        "t = today_local(); d = lambda n: t - dt.timedelta(days=n)\n"
+        "with session_scope() as s:\n"
+        "    s.add(Alert(day=d(1), kind='illness', level='alert', message='', dedupe_key='a1'))\n"
+        "    s.add(Alert(day=d(20), kind='illness', level='watch', message='', dedupe_key='a2'))\n"
+        "with session_scope() as s:\n"
+        "    q = feedback.pending_question(s, t)\n"
+        "    feedback.record(s, d(1), 'sick', 'feedback')\n"
+        "    feedback.record(s, d(20), 'other_cause', 'feedback')\n"
+        "    feedback.record(s, d(40), 'sick', 'self')\n"
+        "    feedback.record(s, d(39), 'sick', 'self')\n"
+        "with session_scope() as s:\n"
+        "    again = feedback.pending_question(s, t)\n"
+        "    r = feedback.track_record(s, t)\n"
+        "print(json.dumps({'q': [str(q[0]), q[1]], 'again': again, 'alerts': r.alerts,"
+        " 'confirmed': r.confirmed, 'other': r.other_cause, 'ill': r.illnesses, 'caught': r.caught}))"
+    ))
+    r = json.loads(out)
+    assert r["q"][1] == "alert"            # asked about yesterday's alert
+    assert r["again"] is None              # answered — not asked twice
+    assert (r["alerts"], r["confirmed"], r["other"]) == (2, 1, 1)
+    # Two illnesses: the alerted one (caught) and a two-day one with no alert (missed).
+    assert (r["ill"], r["caught"]) == (2, 1)

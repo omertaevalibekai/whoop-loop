@@ -36,6 +36,20 @@ Sources
          +8.7 bpm and RMSSD −2.0 / −5.7 / −12.9 ms after low / moderate / high
          alcohol doses — a moderate dose alone reaches the [ALAVI] red line.
 
+Tried and dropped: CuSum, also from [ALAVI] (sensitivity 72%, specificity
+83.7% in the study). It sums small nightly excesses so a slow rise could
+alert before any single night crosses 4 bpm. Evaluated on synthetic history
+(4 healthy histories x 110 days, 5 abrupt and 4 gradual illness episodes):
+on resting HR alone no setting of k/h kept false flags low while catching
+most episodes; used only with breathing/temperature confirmation it caught
+the same episodes on the same nights as the rules below, with one extra false
+alert. No measurable benefit, so it is not part of the decision.
+
+Confounders: [ALAVI] names alcohol, stress, intense exercise, travel and
+vaccination as non-illness causes of alerts, with resting HR peaking on
+nights 1–2 after a vaccine dose. Travel is detected from a change in the
+time zone WHOOP records for the night, so it needs no diary entry.
+
 What is our own choice, not a study's: the 2.0 SD line for respiratory rate
 and skin temperature, −1.5 SD for HRV, and how the signals are combined.
 The studies show the signals move and that combining them helps; they do not
@@ -73,6 +87,8 @@ TEMP_Z = 2.0               # our choice
 HRV_Z = -1.5               # our choice; HRV falls from sleep, alcohol, training too
 
 MIN_POINTS = 10            # a "norm" from fewer nights is noise
+
+HIGH_STRESS = 8            # diary stress on a 1–10 scale
 
 # Confounders named by [ALAVI] and quantified by [PIET].
 ALCOHOL_UNITS = 1.0
@@ -283,12 +299,38 @@ def _confounders(session: Session, day: dt.date) -> list[str]:
             found.append(f"алкоголь ({factors.alcohol_units:g} ед.)")
         if factors.travel:
             found.append("поездка")
+        if (factors.stress or 0) >= HIGH_STRESS:
+            found.append(f"сильный стресс ({factors.stress}/10)")
     strains = session.scalars(
         select(Workout.strain).where(Workout.day == evening, Workout.strain.is_not(None))
     ).all()
     if strains and max(strains) >= HARD_STRAIN:
         found.append(f"очень тяжёлая тренировка (strain {max(strains):.1f})")
+    if _time_zone_changed(session, day) and "поездка" not in found:
+        found.append("смена часового пояса (перелёт)")
+
+    from app.analytics.feedback import recent_vaccine
+
+    if recent_vaccine(session, day):
+        found.append("прививка")
     return found
+
+
+def _time_zone_changed(session: Session, day: dt.date) -> bool:
+    """WHOOP stamps each night with its time zone; a change means a trip."""
+    from app.models import Sleep
+
+    offsets = {}
+    for night in (day, day - dt.timedelta(days=1)):
+        offset = session.scalar(
+            select(Sleep.timezone_offset)
+            .where(Sleep.day == night, Sleep.nap.is_(False))
+            .order_by(Sleep.start.desc())
+            .limit(1)
+        )
+        if offset:
+            offsets[night] = offset
+    return len(offsets) == 2 and len(set(offsets.values())) == 2
 
 
 # --------------------------------------------------------------- decision
@@ -313,7 +355,7 @@ def decide(
     independent = [s for s in (rr, temp) if s.flagged]
     reasons: list[str] = []
     if rhr.flagged:
-        reasons.append(f"пульс покоя выше нормы на {RHR_RED_BPM:.0f}+ уд {RHR_RED_NIGHTS} ночи подряд")
+        reasons.append(f"пульс покоя {rhr.detail}" if rhr.detail else "пульс покоя выше нормы")
     reasons += [f"{s.label.lower()} вне нормы" for s in (rr, temp, hrv) if s.flagged]
 
     if rhr.flagged and independent:
@@ -359,7 +401,9 @@ def check(session: Session, day: dt.date | None = None) -> IllnessReport:
         return report
 
     report.confounders = _confounders(session, day)
-    report.level, report.reasons = decide(rhr, rhr_yellow, rr, temp, hrv, report.confounders)
+    report.level, report.reasons = decide(
+        rhr, rhr_yellow, rr, temp, hrv, report.confounders,
+    )
     if report.level == "green":
         report.confounders = []
     return report

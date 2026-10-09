@@ -239,3 +239,23 @@ class Setting(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[str] = mapped_column(Text, default="")
+
+
+class HealthEvent(Base):
+    """What actually happened, as told by the owner.
+
+    Labels for the illness detector — "was that alert real?" — and events the
+    detector should know about (a vaccine dose). Without these there is no way
+    to tell a true alert from a false one, or to notice a missed illness.
+    """
+
+    __tablename__ = "health_events"
+    __table_args__ = (UniqueConstraint("day", "kind", name="uq_health_event"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    day: Mapped[dt.date] = mapped_column(Date, index=True)
+    # sick | other_cause | fine | vaccine
+    kind: Mapped[str] = mapped_column(String(16))
+    # feedback (answer to the bot's question) | self (reported unprompted)
+    source: Mapped[str] = mapped_column(String(16), default="self")
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
