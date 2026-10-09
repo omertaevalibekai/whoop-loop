@@ -13,7 +13,6 @@ from sqlalchemy.orm import Session  # noqa: E402
 
 from app.analytics.baseline import build_baseline, ewma, trend_slope  # noqa: E402
 from app.analytics.energy import compute_state  # noqa: E402
-from app.analytics.illness import DIRECTION, PRIMARY, SUPPORTING  # noqa: E402
 from app.analytics.series import LABELS, get_series  # noqa: E402
 from app.util import today_local  # noqa: E402
 
@@ -215,25 +214,22 @@ def chart_sleep(session: Session, days: int = 30) -> str:
 
 
 def chart_illness(session: Session) -> str:
-    """Deviation of each health signal from its personal baseline, in sigmas."""
-    day = today_local()
-    metrics = list(PRIMARY) + list(SUPPORTING)
+    """How close each health signal is to its alert threshold.
 
+    The rules use different units (bpm above the norm for resting heart rate,
+    SDs for the rest), so every bar is the share of its own threshold:
+    1.0 is the line where that signal counts as a warning sign.
+    """
+    from app.analytics import illness
+
+    report = illness.check(session)
     labels, values, colors = [], [], []
-    for metric in metrics:
-        series = get_series(session, metric, days=7, end_day=day)
-        if not series:
+    for signal in report.signals:
+        if signal.score is None:
             continue
-        value = series.get(day, series[max(series)])
-        baseline = build_baseline(session, metric, day)
-        z = baseline.z(value)
-        if z is None:
-            continue
-        # Flip sign so a positive bar always means "worse than normal".
-        oriented = z * DIRECTION[metric]
-        labels.append(LABELS.get(metric, metric))
-        values.append(oriented)
-        colors.append(RED if oriented >= 1.5 else (YELLOW if oriented >= 1.0 else GREEN))
+        labels.append(LABELS.get(signal.metric, signal.metric))
+        values.append(signal.score)
+        colors.append(RED if signal.score >= 1.0 else (YELLOW if signal.score >= 0.66 else GREEN))
 
     if not labels:
         return _empty("illness.png", "Недостаточно истории для базовой линии")
@@ -242,8 +238,8 @@ def chart_illness(session: Session) -> str:
     _style(fig, [ax])
     ax.barh(labels, values, color=colors, height=0.55)
     ax.axvline(0, color=MUTED, linewidth=1.0)
-    ax.axvline(1.5, color=RED, linewidth=1.2, linestyle="--", alpha=0.8)
-    ax.set_xlabel("Отклонение от нормы (вправо — хуже), сигм")
+    ax.axvline(1.0, color=RED, linewidth=1.2, linestyle="--", alpha=0.8)
+    ax.set_xlabel("Доля порога тревоги (1 — порог; вправо — хуже)")
     ax.set_title("Панель здоровья", fontsize=13, pad=12)
     ax.grid(axis="y", visible=False)
     fig.tight_layout()

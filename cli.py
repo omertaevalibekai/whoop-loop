@@ -152,7 +152,9 @@ def cmd_demo(args: argparse.Namespace) -> None:
         for offset in range(days, -1, -1):
             day = end - dt.timedelta(days=offset)
             index = days - offset
-            sick = args.with_illness and offset <= 1
+            # Illness builds over several nights in the studies ([ALAVI]: median 3 days
+            # before symptoms), so the demo episode spans the last three nights.
+            sick = args.with_illness and offset <= 2
 
             # Slow downward drift plus day-to-day water noise.
             weight -= 0.055 + random.gauss(0, 0.02)
@@ -160,7 +162,7 @@ def cmd_demo(args: argparse.Namespace) -> None:
 
             base_hrv = 62 + 8 * math.sin(index / 9.0)
             hrv = base_hrv + random.gauss(0, 6) - (14 if sick else 0)
-            rhr = 54 - 2 * math.sin(index / 9.0) + random.gauss(0, 2) + (7 if sick else 0)
+            rhr = 54 - 2 * math.sin(index / 9.0) + random.gauss(0, 2) + (9 if sick else 0)
             recovery = max(5, min(99, 55 + (hrv - 62) * 1.6 + random.gauss(0, 8)))
             if sick:
                 recovery = max(8, recovery - 25)
@@ -244,7 +246,7 @@ def cmd_demo(args: argparse.Namespace) -> None:
 
     print(f"Сгенерировано {days} дней демо-истории.")
     if args.with_illness:
-        print("Последние два дня размечены как начало болезни — проверь python cli.py digest")
+        print("Последние три ночи размечены как начало болезни — проверь python cli.py digest")
 
 
 def cmd_widget(args: argparse.Namespace) -> None:

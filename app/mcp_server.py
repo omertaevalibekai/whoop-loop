@@ -69,12 +69,16 @@ def whoop_illness_check() -> str:
             "level": report.level,
             "headline": report.headline,
             "primary_flags": report.flags_primary,
+            "reasons": report.reasons,
+            "confounders": report.confounders,
+            "rules": illness_mod.SOURCES_SHORT,
             "signals": [
                 {
                     "metric": s.metric,
                     "value": s.value,
                     "baseline": s.center,
                     "z": None if s.z is None else round(s.z, 2),
+                    "share_of_threshold": None if s.score is None else round(s.score, 2),
                     "flagged": s.flagged,
                 }
                 for s in report.signals
