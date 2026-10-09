@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Whoop widget preview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  body { margin: 0; background: #f2f2f7; font: 13px system-ui; color: #333; padding: 24px; }
+  h2 { font-size: 13px; font-weight: 600; margin: 28px 0 10px; color: #666; text-transform: uppercase; letter-spacing: .06em; }
+  .row { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .cell { display: flex; flex-direction: column; gap: 6px; }
+  .cell small { color: #888; }
+  .home { background: linear-gradient(160deg, #3a4a5c, #1d2733); padding: 22px; border-radius: 28px; display: flex; gap: 22px; flex-wrap: wrap; }
+  .lock { background: linear-gradient(170deg, #7d8b7a 0%, #4f5d52 45%, #2c3530 100%); padding: 22px; border-radius: 28px;
+          display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .widget { box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  .accessoryCircular, .accessoryRectangular, .accessoryInline { box-shadow: none; }
+  .err { color: #c00; white-space: pre; font: 12px monospace; }
+</style>
+<script src="scriptable-shim.js"></script>
+</head>
+<body>
+<div id="out"></div>
+<script>
+const DATASETS = (new URLSearchParams(location.search).get("data") || "real,alarm").split(",")
+const PAGES = [["", "восстановление"], ["sleep", "сон"], ["body", "тело"]]
+const HOME = ["small", "medium"]
+const LOCK = ["accessoryCircular", "accessoryRectangular", "accessoryInline"]
+
+async function build(code, data, family, param) {
+  class Request { constructor() {} async loadJSON() { return data } }
+  const FileManager = { local: () => ({ joinPath: (a, b) => a + "/" + b, cacheDirectory: () => "/c",
+    documentsDirectory: () => "/d", writeString() {}, fileExists: () => false, readString: () => "" }) }
+  const module = {}
+  const fn = new (Object.getPrototypeOf(async function () {}).constructor)(
+    "module", "Request", "FileManager", "config", "args", code)
+  await fn(module, Request, FileManager, { widgetFamily: family, runsInWidget: true }, { widgetParameter: param })
+  return renderWidget(await module.exports(), family)
+}
+
+;(async () => {
+  const out = document.getElementById("out")
+  const code = await (await fetch("../whoop-core.js?t=" + Date.now())).text()
+  for (const ds of DATASETS) {
+    const data = await (await fetch(`data/${ds}.json?t=${Date.now()}`)).json()
+    const h = document.createElement("h2"); h.textContent = `данные: ${ds}`; out.appendChild(h)
+    for (const [param, title] of PAGES) {
+      const row = document.createElement("div"); row.className = "row"; row.style.marginBottom = "18px"
+      const home = document.createElement("div"); home.className = "home"
+      const lock = document.createElement("div"); lock.className = "lock"
+      for (const f of HOME) {
+        try { home.appendChild(await build(code, data, f, param)) }
+        catch (e) { const d = document.createElement("div"); d.className = "err"; d.textContent = `${title} ${f}: ${e.stack}`; home.appendChild(d) }
+      }
+      for (const f of LOCK) {
+        try { lock.appendChild(await build(code, data, f, param)) }
+        catch (e) { const d = document.createElement("div"); d.className = "err"; d.textContent = `${title} ${f}: ${e.stack}`; lock.appendChild(d) }
+      }
+      const cap = document.createElement("div"); cap.className = "cell"
+      cap.innerHTML = `<small>${title}</small>`; cap.appendChild(home)
+      const cap2 = document.createElement("div"); cap2.className = "cell"
+      cap2.innerHTML = `<small>${title} · экран блокировки</small>`; cap2.appendChild(lock)
+      row.appendChild(cap); row.appendChild(cap2); out.appendChild(row)
+    }
+  }
+  document.body.dataset.ready = "1"
+})()
+</script>
+</body>
+</html>

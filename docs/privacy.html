@@ -1,0 +1,393 @@
+<title>Whoop Loop Privacy Policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+
+<style>
+  :root {
+    --paper:      #fcfcfd;
+    --surface:    #f3f4f8;
+    --rule:       #dcdee7;
+    --ink:        #16181f;
+    --ink-soft:   #565b6b;
+    --accent:     #3d5a80;
+    --accent-dim: #e6ecf4;
+    --flag:       #8a5a12;
+    --flag-dim:   #f7efe0;
+
+    --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --sans:  "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono:  "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101219;
+      --surface:    #171a23;
+      --rule:       #2a2f3d;
+      --ink:        #e0e3ec;
+      --ink-soft:   #949bad;
+      --accent:     #8fb0d8;
+      --accent-dim: #1b2534;
+      --flag:       #d9ab63;
+      --flag-dim:   #2a2317;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #101219;
+    --surface:    #171a23;
+    --rule:       #2a2f3d;
+    --ink:        #e0e3ec;
+    --ink-soft:   #949bad;
+    --accent:     #8fb0d8;
+    --accent-dim: #1b2534;
+    --flag:       #d9ab63;
+    --flag-dim:   #2a2317;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* ---- masthead ---- */
+
+  header { display: flex; flex-direction: column; gap: 14px; }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(28px, 5vw, 38px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  .standfirst {
+    color: var(--ink-soft);
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .meta {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+  .meta b { color: var(--ink); font-weight: 500; }
+
+  /* ---- sections ---- */
+
+  section { display: flex; flex-direction: column; gap: 14px; }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+
+  h2 .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--accent);
+    flex: none;
+  }
+
+  p { margin: 0; }
+
+  ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+  li::marker { color: var(--accent); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  em { font-style: italic; }
+  strong { font-weight: 500; }
+
+  /* ---- data inventory table ---- */
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+
+  thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.45;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { font-weight: 500; }
+
+  .dest {
+    font-family: var(--mono);
+    font-size: 12px;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .dest.leaves { background: var(--flag-dim); color: var(--flag); }
+
+  /* ---- callout ---- */
+
+  .callout {
+    border-left: 3px solid var(--flag);
+    background: var(--flag-dim);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+  }
+  .callout .label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--flag);
+  }
+
+  /* ---- contact + footer ---- */
+
+  .contact {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 24px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    align-items: baseline;
+  }
+  .contact dt { color: var(--ink-soft); white-space: nowrap; }
+  .contact dd { margin: 0; color: var(--ink); }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  @media (max-width: 520px) {
+    body { font-size: 16px; }
+    .wrap { padding: 36px 18px 72px; gap: 34px; }
+    .contact { grid-template-columns: 1fr; gap: 4px 0; }
+    .contact dd { margin-bottom: 10px; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Privacy Policy</div>
+    <h1>Whoop Loop</h1>
+    <p class="standfirst">A single-user personal health application built on the WHOOP Developer API. This policy describes exactly what it reads, where that data is kept, and the only three places any of it is ever sent.</p>
+    <div class="meta">
+      <span><b>Effective</b> 8 September 2026</span>
+      <span><b>Version</b> 1.0</span>
+      <span><b>Users</b> 1 (the developer)</span>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="num">01</span> What this application is</h2>
+    <p>Whoop Loop is a personal, self-hosted application written by one developer for their own use. It runs on that developer's own computer, is operated through a private Telegram bot with a single authorized chat, and has no public interface, no sign-up, and no other users.</p>
+    <p>There is no company behind it, no commercial offering, and no plan to distribute it. If it is ever offered to anyone else, this policy will be rewritten before that happens.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span> Data accessed from WHOOP</h2>
+    <p>With the account owner's explicit authorization, the application reads the following through the WHOOP Developer API, using these scopes:</p>
+    <ul>
+      <li><code>read:recovery</code> — recovery score, heart rate variability, resting heart rate, blood oxygen, skin temperature</li>
+      <li><code>read:cycles</code> — daily strain and energy expenditure</li>
+      <li><code>read:sleep</code> — sleep stages, duration, efficiency, respiratory rate, sleep need and debt</li>
+      <li><code>read:workout</code> — workout type, duration, heart rate zones, energy expenditure</li>
+      <li><code>read:profile</code> — first name, last name, email address on the WHOOP account</li>
+      <li><code>read:body_measurement</code> — height, weight, maximum heart rate</li>
+      <li><code>offline</code> — a refresh token, so the application can sync without re-authorizing every hour</li>
+    </ul>
+    <p>The application only reads. It never writes to, modifies, or deletes anything in the WHOOP account.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span> Where the data lives</h2>
+    <p>All WHOOP data is stored in a single SQLite database file on the developer's own machine. Alongside it the application stores data the developer enters directly: body weight, food and calorie entries, and short diary notes about alcohol, caffeine, stress, and how they felt.</p>
+    <p>There is no cloud database, no hosted backend, and no third party holding a copy of the health history. The OAuth tokens are stored in that same local file and are never transmitted anywhere except back to WHOOP to refresh a session.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span> What leaves the device</h2>
+    <p>Three services necessarily receive data, because the features that use them run remotely. Nothing else is ever sent anywhere.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Data</th>
+            <th scope="col">Goes to</th>
+            <th scope="col">Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>WHOOP physiological history</td>
+            <td><span class="dest">stays local</span></td>
+            <td>Stored and analyzed on the device only</td>
+          </tr>
+          <tr>
+            <td>Weight, food, calorie entries</td>
+            <td><span class="dest">stays local</span></td>
+            <td>Stored and analyzed on the device only</td>
+          </tr>
+          <tr>
+            <td>Bot messages and summaries</td>
+            <td><span class="dest leaves">Telegram</span></td>
+            <td>Telegram is the interface; messages pass through it in transit</td>
+          </tr>
+          <tr>
+            <td>Voice note audio</td>
+            <td><span class="dest leaves">OpenAI</span></td>
+            <td>Speech-to-text transcription of spoken diary entries</td>
+          </tr>
+          <tr>
+            <td>Diary note text</td>
+            <td><span class="dest leaves">Anthropic</span></td>
+            <td>Turning a free-form note into structured fields</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <div class="label">Worth being clear about</div>
+      <p>Voice and diary features are optional. With no OpenAI key configured, voice transcription is disabled and voice notes are never uploaded. With no Anthropic key configured, notes are parsed locally with pattern matching and no note text leaves the device. Neither provider is sent WHOOP physiological data, and neither is sent anything that identifies the account holder.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span> What the application does not do</h2>
+    <ul>
+      <li>No data is sold, rented, licensed, or shared with any third party.</li>
+      <li>No advertising, no ad networks, no marketing profiles, no tracking pixels.</li>
+      <li>No analytics or telemetry of any kind is collected or transmitted.</li>
+      <li>No data from any other person is collected — the application has exactly one user.</li>
+      <li>No automated decisions with legal or similarly significant effects are made. Its output is informational only and is not medical advice, diagnosis, or treatment.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span> Retention and deletion</h2>
+    <p>Data is kept for as long as the developer chooses to keep it, because the file sits on their own disk. There is no server-side copy to request the deletion of.</p>
+    <p>To remove everything: delete the local database file, which erases the full history and the stored tokens at once. To cut off future access independently, revoke the application from the WHOOP account's connected-apps settings; the refresh token stops working immediately.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">07</span> Security</h2>
+    <p>All traffic to WHOOP, Telegram, OpenAI, and Anthropic uses TLS. API credentials and tokens are held in a local environment file and a local database, neither of which is committed to version control. The application binds its OAuth callback server to the loopback interface, so it is not reachable from the network.</p>
+    <p>Because the application runs on a personal machine, the practical security of the data is the security of that machine.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">08</span> Children</h2>
+    <p>The application is not directed at children and is not used by anyone under 16. Its only user is the developer.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">09</span> Changes to this policy</h2>
+    <p>If what the application does with data changes, this page is updated and the effective date at the top changes with it. Since there is one user, there is no separate notification mechanism.</p>
+  </section>
+
+  <section>
+    <h2><span class="num">10</span> Contact</h2>
+    <p>Questions about this policy or about the data the application handles:</p>
+    <dl class="contact">
+      <dt>Application</dt>
+      <dd>Whoop Loop</dd>
+      <dt>Developer</dt>
+      <dd>Alibek Omertaev</dd>
+      <dt>Email</dt>
+      <dd>[ CONTACT EMAIL — replace before submitting ]</dd>
+    </dl>
+  </section>
+
+  <footer>
+    Whoop Loop is an independent personal project. It is not affiliated with, sponsored by, or endorsed by WHOOP, Inc., and WHOOP is not responsible for it. WHOOP is a trademark of its respective owner, used here only to identify the API the application connects to.
+  </footer>
+
+</div>

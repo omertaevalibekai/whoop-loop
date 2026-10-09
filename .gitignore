@@ -1,0 +1,21 @@
+# Virtualenv and bytecode
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets: live Whoop client secret and Telegram bot token
+.env
+
+# The database holds the OAuth refresh token — never commit it,
+# and ignore the whole directory so backups and journals cannot slip through.
+data/
+charts/
+
+*.log
+*.bak
+
+# Widget preview uses real health snapshots
+widget/preview/data/
+
+# Per-machine deploy settings (SSH key path)
+deploy/local.env

@@ -1,0 +1,26 @@
+[Unit]
+Description=Whoop Loop telegram bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=opc
+WorkingDirectory=/opt/whoop-loop
+Environment=PYTHONUNBUFFERED=1
+Environment=TZ=Asia/Almaty
+# ProtectHome hides /home, so matplotlib needs a writable cache dir of its own.
+Environment=MPLCONFIGDIR=/opt/whoop-loop/.cache/matplotlib
+ExecStart=/opt/whoop-loop/.venv/bin/python run_bot.py
+Restart=always
+RestartSec=10
+
+# Hardening: the bot needs nothing but its own directory and outbound network.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/whoop-loop/data /opt/whoop-loop/charts /opt/whoop-loop/.cache
+
+[Install]
+WantedBy=multi-user.target
