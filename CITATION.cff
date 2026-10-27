@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Whoop Loop: personal AI health analyst on top of WHOOP"
+abstract: >-
+  Personal health analyst over the WHOOP API: early illness warnings from
+  deviations against personal baselines (rules after Alavi 2022, Miller 2020,
+  Mason 2022), a self-calibrating energy balance, a Telegram bot and an MCP
+  server for Claude. Thresholds and the alert combination are the author's
+  choice and have not been clinically validated.
+authors:
+  - given-names: Alibek
+    family-names: Omertaev
+repository-code: "https://github.com/omertaevalibekai/whoop-loop"
+url: "https://pypi.org/project/whoop-loop/"
+license: MIT
+keywords:
+  - whoop
+  - wearables
+  - illness detection
+  - heart rate variability
+  - mcp
+  - claude
