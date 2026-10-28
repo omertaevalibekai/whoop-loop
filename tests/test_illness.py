@@ -7,7 +7,7 @@ import tempfile
 
 import pytest
 
-from app.analytics.illness import Signal, decide
+from whoop_loop.analytics.illness import Signal, decide
 
 
 def sig(metric: str, flagged: bool, primary: bool = True) -> Signal:
@@ -80,10 +80,10 @@ def test_confounder_does_not_hide_a_watch_or_invent_one():
 # --- whole detector on generated history ------------------------------------
 
 def _fresh_db(monkeypatch, tmp_path):
-    from app import config
+    from whoop_loop import config
     url = f"sqlite:///{(tmp_path / 'test.db').as_posix()}"
     monkeypatch.setattr(config.settings, "db_url", url, raising=False)
-    import app.db as db
+    import whoop_loop.db as db
     if hasattr(db, "reset_engine"):
         db.reset_engine()
     return db
@@ -103,7 +103,7 @@ def demo(tmp_path, monkeypatch):
         subprocess.run([sys.executable, "cli.py", "demo", "--days", "120", *flags],
                        cwd=root, env=env, check=True, capture_output=True)
         code = (
-            "import json; from app.db import session_scope; from app.analytics import illness\n"
+            "import json; from whoop_loop.db import session_scope; from whoop_loop.analytics import illness\n"
             "with session_scope() as s:\n"
             "    r = illness.check(s)\n"
             "    print(json.dumps({'level': r.level, 'flags': [x.metric for x in r.signals if x.flagged],"
@@ -141,7 +141,7 @@ def _run_in_db(db_url: str, root: str, code: str) -> str:
 
 
 CHECK = (
-    "import json; from app.db import session_scope; from app.analytics import illness\n"
+    "import json; from whoop_loop.db import session_scope; from whoop_loop.analytics import illness\n"
     "with session_scope() as s:\n"
     "    r = illness.check(s); print(json.dumps({'level': r.level, 'conf': r.confounders}))"
 )
@@ -152,8 +152,8 @@ def test_time_zone_change_downgrades_the_alert(demo):
     make, db_url, root = demo
     assert json.loads(make("--with-illness"))["level"] == "alert"
     _run_in_db(db_url, root, (
-        "from sqlalchemy import select; from app.db import session_scope; from app.models import Sleep\n"
-        "from app.util import today_local\n"
+        "from sqlalchemy import select; from whoop_loop.db import session_scope; from whoop_loop.models import Sleep\n"
+        "from whoop_loop.util import today_local\n"
         "with session_scope() as s:\n"
         "    for sl in s.scalars(select(Sleep).where(Sleep.day == today_local())): sl.timezone_offset = '+09:00'\n"
         "    for sl in s.scalars(select(Sleep).where(Sleep.day < today_local())): sl.timezone_offset = '+05:00'\n"
@@ -169,8 +169,8 @@ def test_vaccine_dose_downgrades_the_alert(demo):
     make, db_url, root = demo
     make("--with-illness")
     _run_in_db(db_url, root, (
-        "import datetime as dt; from app.db import session_scope; from app.analytics import feedback\n"
-        "from app.util import today_local\n"
+        "import datetime as dt; from whoop_loop.db import session_scope; from whoop_loop.analytics import feedback\n"
+        "from whoop_loop.util import today_local\n"
         "with session_scope() as s: feedback.record(s, today_local() - dt.timedelta(days=1), 'vaccine')\n"
         "print('ok')"
     ))
@@ -185,9 +185,9 @@ def test_feedback_question_answer_and_track_record(demo):
     make()
     out = _run_in_db(db_url, root, (
         "import datetime as dt, json\n"
-        "from app.db import session_scope; from app.models import Alert\n"
-        "from app.analytics import feedback\n"
-        "from app.util import today_local\n"
+        "from whoop_loop.db import session_scope; from whoop_loop.models import Alert\n"
+        "from whoop_loop.analytics import feedback\n"
+        "from whoop_loop.util import today_local\n"
         "t = today_local(); d = lambda n: t - dt.timedelta(days=n)\n"
         "with session_scope() as s:\n"
         "    s.add(Alert(day=d(1), kind='illness', level='alert', message='', dedupe_key='a1'))\n"

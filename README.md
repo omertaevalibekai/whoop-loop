@@ -1,3 +1,5 @@
+[![CI](https://github.com/omertaevalibekai/whoop-loop/actions/workflows/ci.yml/badge.svg)](https://github.com/omertaevalibekai/whoop-loop/actions/workflows/ci.yml)
+
 <div align="center">
 
 # Whoop Loop
@@ -16,7 +18,7 @@ iPhone widgets.
 ![WHOOP API](https://img.shields.io/badge/WHOOP%20API-v2-111111)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<img src="docs/img/widgets.png" alt="Whoop Loop widgets: recovery, sleep, strain, alert mode and lock screen" width="760">
+<img src="https://raw.githubusercontent.com/omertaevalibekai/whoop-loop/main/docs/img/widgets.png" alt="Whoop Loop widgets: recovery, sleep, strain, alert mode and lock screen" width="760">
 
 <sub>Widgets on demo data: recovery, sleep, strain, alert mode, lock screen.</sub>
 
@@ -100,7 +102,7 @@ snapshot to a secret gist and the widget reads it from there.
 
 ## How the bot detects illness
 
-<img src="docs/img/illness-alert.png" alt="Health panel: resting HR, breathing and temperature past the alert threshold" width="520" align="right">
+<img src="https://raw.githubusercontent.com/omertaevalibekai/whoop-loop/main/docs/img/illness-alert.png" alt="Health panel: resting HR, breathing and temperature past the alert threshold" width="520" align="right">
 
 The rules come from published wearable studies. Every signal is compared with
 **your** norm, not a population average.
@@ -157,13 +159,13 @@ rule for this exact combination on WHOOP data.
 **Synthetic check:** 1 false alert (and 19 watches) in 440 healthy days;
 9 alerts on 9 generated illness episodes, abrupt and gradual. That tests the
 logic — it is not clinical validation. Full references are in
-[`app/analytics/illness.py`](app/analytics/illness.py).
+[`whoop_loop/analytics/illness.py`](https://github.com/omertaevalibekai/whoop-loop/blob/main/whoop_loop/analytics/illness.py).
 
 <br clear="right">
 
 ## How calorie calibration works
 
-<img src="docs/img/weight.png" alt="Weight: measurements and smoothed trend" width="520" align="right">
+<img src="https://raw.githubusercontent.com/omertaevalibekai/whoop-loop/main/docs/img/weight.png" alt="Weight: measurements and smoothed trend" width="520" align="right">
 
 WHOOP estimates calorie burn from heart rate, with a systematic error. Food
 logging is imprecise too. The loop doesn't fight either error head-on — it
@@ -185,13 +187,29 @@ amazing metabolism.
 ## Try it in 2 minutes — no WHOOP needed
 
 Demo mode generates 4 months of plausible history, including the onset of an
-illness so you can see an alert:
+illness so you can see an alert.
+
+After the first PyPI release, the package can be installed as follows (the database lives in `~/.whoop-loop`, or wherever `WHOOP_LOOP_HOME` points). Until then, use the source instructions below:
+
+```bash
+python -m pip install whoop-loop
+whoop-loop demo --days 120 --with-illness
+whoop-loop digest
+```
+
+The core package covers the CLI, WHOOP sync and the MCP server. The Telegram
+bot, voice diary and charts need `pip install "whoop-loop[bot]"`.
+
+From source:
 
 ```bash
 git clone https://github.com/omertaevalibekai/whoop-loop.git
 cd whoop-loop
 python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements.txt   # Linux/macOS: .venv/bin/python
+# Activate in bash (Linux/macOS):
+source .venv/bin/activate
+# Or in Windows PowerShell: .venv/Scripts/Activate.ps1
+python -m pip install -e ".[bot]"
 
 python cli.py demo --days 120 --with-illness
 python cli.py digest      # the morning brief
@@ -261,6 +279,13 @@ without a phone, open `widget/preview/index.html` — a Scriptable emulator in
 the browser.
 
 ### MCP for Claude
+
+```bash
+claude mcp add whoop -- uvx whoop-loop-mcp
+```
+
+It reads the database in `~/.whoop-loop`; set `WHOOP_LOOP_HOME` to use another
+one. From a checkout:
 
 ```bash
 claude mcp add whoop -- /path/to/whoop-loop/.venv/bin/python /path/to/whoop-loop/run_mcp.py
@@ -348,13 +373,13 @@ pip install pytest && python -m pytest -q
 python cli.py demo --days 120 --with-illness && python cli.py digest
 ```
 
-New analytics go in `app/analytics/`, one job per module. If you change the
+New analytics go in `whoop_loop/analytics/`, one job per module. If you change the
 illness detector's thresholds, say in the PR what data you checked them on.
 
 ## Project layout
 
 ```
-app/
+whoop_loop/
   whoop/       OAuth, API client, sync
   analytics/   baselines, illness, energy, deficit brake, brief, charts
   diary/       voice transcription, structured parsing
@@ -364,10 +389,24 @@ app/
   mcp_server.py
 widget/        Scriptable scripts and a preview emulator
 deploy/        deploying to a small server without Docker
-cli.py
+cli.py         shortcut for `whoop-loop` in a checkout
 ```
 
 ## License
 
-[MIT](LICENSE). WHOOP is a trademark of WHOOP, Inc.; this project is not
+[MIT](https://github.com/omertaevalibekai/whoop-loop/blob/main/LICENSE). WHOOP is a trademark of WHOOP, Inc.; this project is not
 affiliated with it.
+
+## Development checks
+
+With the virtual environment activated:
+
+```sh
+python -m pip install -e ".[bot]" pytest build twine
+python -m pytest -q
+python -m build
+python -m twine check dist/*
+python tools/check_wheel.py
+```
+
+Tests use generated data and need no WHOOP or Telegram credentials. CI checks Linux and Windows.

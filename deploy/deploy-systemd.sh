@@ -73,10 +73,10 @@ else
 fi
 
 echo "==> Каталог и код"
-"${SSH[@]}" "$TARGET" "sudo mkdir -p $REMOTE_DIR && sudo chown -R \$(id -un):\$(id -gn) $REMOTE_DIR && mkdir -p $REMOTE_DIR/data $REMOTE_DIR/charts && rm -rf $REMOTE_DIR/app"
+"${SSH[@]}" "$TARGET" "sudo mkdir -p $REMOTE_DIR && sudo chown -R \$(id -un):\$(id -gn) $REMOTE_DIR && mkdir -p $REMOTE_DIR/data $REMOTE_DIR/charts && rm -rf $REMOTE_DIR/app $REMOTE_DIR/whoop_loop"
 # tar over ssh: Git Bash on Windows ships no rsync.
 tar -czf - -C "$LOCAL_DIR" --exclude='__pycache__' --exclude='*.pyc' \
-  app deploy cli.py run_bot.py run_api.py run_mcp.py requirements.txt \
+  whoop_loop deploy cli.py run_bot.py run_api.py run_mcp.py requirements.txt \
   | "${SSH[@]}" "$TARGET" "tar -xzf - -C $REMOTE_DIR"
 
 echo "==> Конфигурация"

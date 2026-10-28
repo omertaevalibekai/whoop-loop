@@ -19,3 +19,6 @@ widget/preview/data/
 
 # Per-machine deploy settings (SSH key path)
 deploy/local.env
+
+dist/
+.pytest_cache/

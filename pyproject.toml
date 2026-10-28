@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "whoop-loop"
+version = "0.1.0"
+description = "Personal AI health analyst on top of WHOOP: early illness warnings, self-calibrating calories, MCP server for Claude"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Alibek Omertaev" }]
+requires-python = ">=3.11"
+keywords = ["whoop", "mcp", "claude", "health", "hrv", "wearables", "telegram-bot"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+# The core is enough for the MCP server, sync and the CLI.
+dependencies = [
+    "SQLAlchemy>=2.0.30",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "httpx>=0.27.0",
+    "numpy>=1.26.0",
+    "mcp>=2.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+    "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+# Telegram bot, voice diary and charts.
+bot = [
+    "aiogram>=3.7,<4",
+    "APScheduler>=3.10.4",
+    "anthropic>=1.4.0",
+    "openai>=1.109.0",
+    "matplotlib>=3.9.0",
+]
+
+[project.scripts]
+whoop-loop = "whoop_loop.cli:main"
+whoop-loop-mcp = "whoop_loop.mcp_server:main"
+whoop-loop-bot = "whoop_loop.bot.main:main"
+
+[project.urls]
+Homepage = "https://github.com/omertaevalibekai/whoop-loop"
+Issues = "https://github.com/omertaevalibekai/whoop-loop/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["whoop_loop"]
+
+[tool.hatch.build.targets.sdist]
+include = ["whoop_loop", "tests", "README.md", "LICENSE", "pyproject.toml"]
