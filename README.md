@@ -1,3 +1,5 @@
+[![CI](https://github.com/omertaevalibekai/whoop-loop/actions/workflows/ci.yml/badge.svg)](https://github.com/omertaevalibekai/whoop-loop/actions/workflows/ci.yml)
+
 <div align="center">
 
 # Whoop Loop
@@ -187,11 +189,10 @@ amazing metabolism.
 Demo mode generates 4 months of plausible history, including the onset of an
 illness so you can see an alert.
 
-From PyPI (the database lives in `~/.whoop-loop`, or wherever
-`WHOOP_LOOP_HOME` points):
+After the first PyPI release, the package can be installed as follows (the database lives in `~/.whoop-loop`, or wherever `WHOOP_LOOP_HOME` points). Until then, use the source instructions below:
 
 ```bash
-pip install whoop-loop
+python -m pip install whoop-loop
 whoop-loop demo --days 120 --with-illness
 whoop-loop digest
 ```
@@ -205,7 +206,10 @@ From source:
 git clone https://github.com/omertaevalibekai/whoop-loop.git
 cd whoop-loop
 python -m venv .venv
-.venv/Scripts/python -m pip install -r requirements.txt   # Linux/macOS: .venv/bin/python
+# Activate in bash (Linux/macOS):
+source .venv/bin/activate
+# Or in Windows PowerShell: .venv/Scripts/Activate.ps1
+python -m pip install -e ".[bot]"
 
 python cli.py demo --days 120 --with-illness
 python cli.py digest      # the morning brief
@@ -392,3 +396,17 @@ cli.py         shortcut for `whoop-loop` in a checkout
 
 [MIT](https://github.com/omertaevalibekai/whoop-loop/blob/main/LICENSE). WHOOP is a trademark of WHOOP, Inc.; this project is not
 affiliated with it.
+
+## Development checks
+
+With the virtual environment activated:
+
+```sh
+python -m pip install -e ".[bot]" pytest build twine
+python -m pytest -q
+python -m build
+python -m twine check dist/*
+python tools/check_wheel.py
+```
+
+Tests use generated data and need no WHOOP or Telegram credentials. CI checks Linux and Windows.
